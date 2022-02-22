@@ -16,7 +16,7 @@
 
 {
  experiment <- '2Idaho'; ## Options: 1Sorghum; 2Idaho;  
- exp_dir <- paste(cwd_dir, experiment, '/', sep = '')
+ exp_dir <- paste(cwd, experiment, '/', sep = '')
  env_meta_file <- paste(exp_dir, 'Env_meta_table.txt', sep = ''); ## make sure the PlantingData formated as 'YYYY-MM-DD'
  env_meta_info_0 <- read.table(env_meta_file, header = T, sep = "\t", stringsAsFactors = F);
  
