@@ -504,7 +504,7 @@ Pred_rrBLUP <- function(Y_matrix, X_matrix, prd_idx, n ) {
 Plot_crossvalidation_result <- function(gFold, gIteration, all_env_codes, kpara_append) {
  CV_files <- c('Env_1to2_', paste('Env_1to3_', gFold, 'fold_', gIteration, 'rep_', sep = ''), paste('Env_1to4_', gFold, 'fold_', gIteration, 'rep_', sep = ''))
 
- png_file <- paste(exp_trait_dir, trait, 'Pred_1_to_234_', length(all_env_codes), kpara_append, '.png', sep = ''); 
+ png_file <- paste(exp_trait_dir, trait, 'Pred_1to234_', length(all_env_codes), kpara_append, '.png', sep = ''); 
  png(png_file, width= 4 * 3 * 0.75,height= 4 * 0.75,pointsize= 12, unit = "in", res = 600)
  layout(matrix(1:3, nrow = 1))
   
