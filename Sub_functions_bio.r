@@ -98,14 +98,14 @@ FW_Model <- function(exp_trait, exp_trait_dir, trait, all_env_codes, env_mean_tr
 
 }
 ##############
-CERIS <- function(env_mean_trait, env_paras, searching_days, exp_trait_dir, trait, LOO, Paras, pop_cor_file, pop_corP_file) {
+CERIS <- function(env_mean_trait, env_paras, searching_days, exp_trait_dir, trait, Paras, pop_cor_file, pop_corP_file) {
 # env_paras <- PTT_PTR; p <- 1; dap_x <- searching_days; dap_y <- searching_days; d1_start <- 1; FTdaps <- exp_traits$FTdap
  dap_x <- searching_days;
  dap_y <- searching_days; 
  pop_cor_file <- paste(exp_trait_dir, trait, '_', nrow(env_mean_trait), 'Envirome_', LOO, 'LOO_cor.txt', sep = '');
  pop_corP_max_file <- paste(exp_trait_dir, trait, '_', nrow(env_mean_trait), 'Envirome_', LOO, 'LOO_max_corP.txt', sep = '');
  exs_png_file <- paste(exp_trait_dir,  trait, '_', nrow(env_mean_trait), 'Envs_CERIS_', LOO, 'LOO.png', sep = ''); 
- p <- 1; 
+ p <- 1; LOO <- 0
  nParas <- length(Paras);
  if (!file.exists(pop_cor_file)) {
    dap_win <- searching_days * searching_days  / 2;
@@ -502,9 +502,9 @@ Pred_rrBLUP <- function(Y_matrix, X_matrix, prd_idx, n ) {
 }
 ##########
 Plot_crossvalidation_result <- function(gFold, gIteration, all_env_codes, kpara_append) {
- CV_files <- c('Env_1to2_', paste('Env_1to3_', gFold, 'fold_', gIteration, 'rep', sep = ''), paste('Env_1to4_', gFold, 'fold_', gIteration, 'rep', sep = ''))
+ CV_files <- c('Env_1to2_', paste('Env_1to3_', gFold, 'fold_', gIteration, 'rep_', sep = ''), paste('Env_1to4_', gFold, 'fold_', gIteration, 'rep_', sep = ''))
 
- png_file <- paste(exp_trait_dir, trait, 'Pred_1_to_234_', length(all_env_codes), kpara_append, '.png', sep = ''); 
+ png_file <- paste(exp_trait_dir, trait, 'Pred_1to234_', length(all_env_codes), kpara_append, '.png', sep = ''); 
  png(png_file, width= 4 * 3 * 0.75,height= 4 * 0.75,pointsize= 12, unit = "in", res = 600)
  layout(matrix(1:3, nrow = 1))
   

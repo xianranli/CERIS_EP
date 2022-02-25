@@ -16,7 +16,7 @@
 
 {
  experiment <- '2Idaho'; ## Options: 1Sorghum; 2Idaho;  
- exp_dir <- paste(cwd_dir, experiment, '/', sep = '')
+ exp_dir <- paste(cwd, experiment, '/', sep = '')
  env_meta_file <- paste(exp_dir, 'Env_meta_table.txt', sep = ''); ## make sure the PlantingData formated as 'YYYY-MM-DD'
  env_meta_info_0 <- read.table(env_meta_file, header = T, sep = "\t", stringsAsFactors = F);
  
@@ -60,8 +60,7 @@
 ##########################                  Block 3                  ##########################
 
 {
- LOO_env <- 0; ## 0 means no Leave-one-environment-out; 1 means Leave-one-environment-out. If the number of environments is hight, it is recommended as 0 
- CERIS(env_mean_trait, envParas, searching_days, exp_trait_dir, trait, LOO_env, Paras, pop_cor_file, pop_corP_max_file)#; searching_daps, searching_daps);
+ CERIS(env_mean_trait, envParas, searching_days, exp_trait_dir, trait, Paras, pop_cor_file, pop_corP_max_file)#; searching_daps, searching_daps);
 }
 
 ###############################################################################################
