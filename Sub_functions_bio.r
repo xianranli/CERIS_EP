@@ -5,6 +5,8 @@ col_palette <- diverge_hcl(col_wdw + 1, h = c(260, 0), c = 100, l = c(50, 90), p
 FW_Model <- function(exp_trait, exp_trait_dir, trait, all_env_codes, env_mean_trait, env_meta_info_0) {
  env_meta_info <- env_meta_info_0;
  n_envs <- nrow(env_mean_trait);
+ lm_ab_matrix <- matrix(ncol = 4, nrow = length(line_codes)); ## line_code, a_mean, b_mean, r2
+
  trait_dist_png_file <- paste(exp_trait_dir, trait, n_envs, 'Env_', 'FW.png', sep = '');
 
  n_obs_env <- c(); quantile_1 <- c(); quantile_3 <- c(); key_para <- c(); key_para2 <- c();
@@ -36,11 +38,11 @@ FW_Model <- function(exp_trait, exp_trait_dir, trait, all_env_codes, env_mean_tr
  write.table(line_by_env_df, file = paste(exp_trait_dir, trait, '_', n_envs, 'Env_LbE', '.txt', sep = ''), sep = "\t", row.names = F, quote = F);
 
  
- trait_dist_png_file <- paste(exp_trait_dir, trait, '_', n_envs, '_FW_.png', sep = '');
+ trait_dist_png_file <- paste(exp_trait_dir, trait, '_', n_envs, '_FW.png', sep = '');
 
  png(trait_dist_png_file, width= 8, height= 2, pointsize=12, unit = "in", res = 600);
 
- layout(matrix(c(1:3), 1, 3, byrow = T))
+ layout(matrix(c(1:4), 1, 4, byrow = T))
  env_mean_trait <- env_mean_trait[env_mean_trait$env_code%in% colnames(line_by_env_df),]
  env_geo_order_df <- merge(env_mean_trait, env_meta_info_0);
  env_geo_order_df <- env_geo_order_df[order(env_geo_order_df$lat, env_geo_order_df$lon, env_geo_order_df$PlantingDate),];
@@ -88,11 +90,24 @@ FW_Model <- function(exp_trait, exp_trait_dir, trait, all_env_codes, env_mean_tr
    df3 <- data.frame(meanY = env_mean_trait$meanY, Yobs = as.numeric(line_by_env_df[i, -1]));
    df3 <- df3[!is.na(df3$Yobs),];
    if(nrow(df3) >= 4) {
-    abline(lm(Yobs ~ meanY, data = df3), col = gray_alpha);
+    lm_ab <- lm(Yobs ~ meanY, data = df3)
+    abline(lm_ab, col = gray_alpha);
     points(df3$meanY, df3$Yobs, col = gray_alpha,  pch = 19, cex = .3)
+    a_Mean <- as.vector(round(predict(lm_ab, data.frame(meanY = mean(env_mean_trait$meanY))), 4)); ## adjusted by the population mean
+    b_Mean <- as.vector(round(lm_ab$coefficient[2], 4));
+    R_Mean <- round(summary(lm_ab)$r.squared, 4)
+    lm_ab_matrix[i,] <- c(line_by_env_df[i,1], a_Mean, b_Mean, R_Mean);
    }
  }
  mtext('C', side = 3, at = min(env_mean_trait$meanY)) 
+ lm_ab_matrix <- lm_ab_matrix[!is.na(lm_ab_matrix[,2]),];
+ colnames(lm_ab_matrix) <- c('line_code', 'Intcp_mean', 'Slope_mean','R2_mean');
+ write.table(lm_ab_matrix, file = paste(exp_trait_dir, trait, '_', n_envs, 'Env_FW_ab', '.txt', sep = ''), sep = "\t", row.names = F, quote = F)
+
+ par(mar = c(2.0, 2.0, 1, 0.5) , mgp = c(1, 0.1, 0), tck = -0.01, cex.axis = .7, family = "mono");
+ hist(as.numeric(lm_ab_matrix[,4]), xlab = 'F-W R-squred', ylab = 'Count', main = '')
+ mtext('D', side = 3, at = min(lm_ab_matrix[,4])) 
+ 
 
  dev.off()
 
@@ -102,10 +117,11 @@ CERIS <- function(env_mean_trait, env_paras, searching_days, exp_trait_dir, trai
 # env_paras <- PTT_PTR; p <- 1; dap_x <- searching_days; dap_y <- searching_days; d1_start <- 1; FTdaps <- exp_traits$FTdap
  dap_x <- searching_days;
  dap_y <- searching_days; 
+ p <- 1; LOO <- 0;
  pop_cor_file <- paste(exp_trait_dir, trait, '_', nrow(env_mean_trait), 'Envirome_', LOO, 'LOO_cor.txt', sep = '');
  pop_corP_max_file <- paste(exp_trait_dir, trait, '_', nrow(env_mean_trait), 'Envirome_', LOO, 'LOO_max_corP.txt', sep = '');
  exs_png_file <- paste(exp_trait_dir,  trait, '_', nrow(env_mean_trait), 'Envs_CERIS_', LOO, 'LOO.png', sep = ''); 
- p <- 1; LOO <- 0
+ 
  nParas <- length(Paras);
  if (!file.exists(pop_cor_file)) {
    dap_win <- searching_days * searching_days  / 2;
@@ -276,7 +292,7 @@ Plot_Trait_mean_kPara <- function(env_mean_trait, env_paras, d1, d2, trait, exp_
   r1 <- round(cor(envMeanPara$meanY , envMeanPara$kPara), 3);
   legend("bottom", paste('r = ', r1, sep = ''), bty = "n")
   legend_p <- "topleft";  if (r1 < 0) { legend_p <- "topright"};
-  legend(legend_p, as.vector(env_mean_trait$env_code), pch = 19, col = env_cols, bty = "n", cex = .75 )
+#  legend(legend_p, as.vector(env_mean_trait$env_code), pch = 19, col = env_cols, bty = "n", cex = .75 )
   dev.off()
   
   return(envMeanPara)
@@ -406,7 +422,7 @@ Enviromic_Prediction <- function(gFold, eIteration, envParas, envMeanYs, Paras, 
   }
   PrefPred_df$trait_code <- rep(trait, nrow(PrefPred_df))
  }
- write.table(PrefPred_df, file = paste(exp_trait_dir, trait, '_', n_E,'ENV_EP_', eFold, '_fold', eIteration, 'rep.txt', sep = ''), row.names = F, sep = "\t", quote = F)
+ write.table(PrefPred_df, file = paste(exp_trait_dir, trait, '_', n_E,'ENV_EP_', eFold, 'fold_', eIteration, 'rep.txt', sep = ''), row.names = F, sep = "\t", quote = F)
 }
 ##############
 One_to_4_Prediction <- function(gFold, gIteration, SNPs, exp_trait, line_codes, meanY_kPara, kpara_append) {

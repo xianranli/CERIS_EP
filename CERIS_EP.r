@@ -5,7 +5,7 @@
  if (!require(colorspace)) { install.packages("colorspace", repos = "https://cloud.r-project.org");}
  if (!require(rrBLUP)) { install.packages("rrBLUP", repos = "https://cloud.r-project.org");}
  ###
- cwd <- 'D:/temp/CERIS_EnviromicPrediction/'; #### Modify this for your own directory
+ cwd <- 'D:/temp/CERIS_EnviromicPrediction/CERIS_EP/'; #### Modify this for your own directory
  subfunction_file <- paste(cwd, 'Sub_functions_bio.r', sep = '');
  source(subfunction_file);
 }
@@ -15,7 +15,7 @@
 ##########################                  Block 1                  ##########################
 
 {
- experiment <- '2Idaho'; ## Options: 1Sorghum; 2Idaho;  
+ experiment <- '1Sorghum'; ## Options: 1Sorghum; 2Idaho;  
  exp_dir <- paste(cwd, experiment, '/', sep = '')
  env_meta_file <- paste(exp_dir, 'Env_meta_table.txt', sep = ''); ## make sure the PlantingData formated as 'YYYY-MM-DD'
  env_meta_info_0 <- read.table(env_meta_file, header = T, sep = "\t", stringsAsFactors = F);
@@ -68,9 +68,8 @@
 ##########################                  Block 4                  ##########################
 ### For dataset with SNPs, such as 1Sorghum
 ### Change the following three parameters for the window and environmental parameter with the strongest correlation
- kPara_Name <- 'PTT';
- maxR_dap1 <- 18;
- maxR_dap2 <- 43;
+ if (experiment == '1Sorghum') { kPara_Name <- 'PTT'; maxR_dap1 <- 18; maxR_dap2 <- 43;};
+ if (experiment == '2Idaho') { kPara_Name <- 'GDD'; maxR_dap1 <- 33; maxR_dap2 <- 74;};
 
 {
  kpara_append <- paste(kPara_Name, maxR_dap1, '_', maxR_dap2, sep = '')
